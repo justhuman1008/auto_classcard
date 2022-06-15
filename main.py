@@ -113,35 +113,10 @@ try:
     login_pw = driver.find_element(By.ID, "login_pwd")
     login_pw.send_keys(account_data["pw"])
     login_pw.send_keys(Keys.RETURN)
-    sleep(1)
+    sleep(2)
     driver.get(Class_URL)
 except:
     print("오류 발생: `클래스카드 로그인` 실패")
-    driver.quit()
-    sys.exit()
-
-
-
-'''
-# 단어 저장
-try:
-    html = BeautifulSoup(driver.page_source, "html.parser")
-    cards_box = html.find("div", class_="flip-body")
-    cards_num = len(cards_box.find_all("div", class_="flip-card"))
-
-    Words_Eng_Kor:dict = {}
-    Words_Kor_Eng:dict = {}
-    for i in range(cards_num):
-        Eng = driver.find_element(By.XPATH, f'//*[@id="tab_set_all"]/div[2]/div[{i+1}]/div[4]/div[1]/div[1]/div/div').text
-        Kor = driver.find_element(By.XPATH, f'//*[@id="tab_set_all"]/div[2]/div[{i+1}]/div[4]/div[2]/div[1]/div/div').text
-
-        Words_Eng_Kor[Eng] = Kor
-        Words_Kor_Eng[Kor] = Eng
-    print("단어 저장 완료")
-    print(f'{Words_Eng_Kor}\n-----\n{Words_Kor_Eng}\n')
-    print("="*50)
-except:
-    print("오류 발생: `단어 저장` 실패")
     driver.quit()
     sys.exit()
 
@@ -159,6 +134,32 @@ except:
 
 
 
+
+# 단어 저장
+try:
+    html = BeautifulSoup(driver.page_source, "html.parser")
+    cards_box = html.find("div", class_="flip-body")
+    cards_num = len(cards_box.find_all("div", class_="flip-card"))
+
+    Words_Eng_Kor:dict = {}
+    Words_Kor_Eng:dict = {}
+    for i in range(cards_num):
+        Eng = driver.find_element(By.XPATH, f'//*[@id="tab_set_all"]/div[2]/div[{i+1}]/div[4]/div[1]/div[1]/div/div').text
+        Kor = driver.find_element(By.XPATH, f'//*[@id="tab_set_all"]/div[2]/div[{i+1}]/div[4]/div[2]/div[1]/div/div').text
+
+        Words_Eng_Kor[Eng] = Kor
+        Words_Kor_Eng[Kor] = Eng
+    print(f"{len(Words_Eng_Kor.keys())}개 단어 저장 완료")
+    print(f'{Words_Eng_Kor}')
+    print("="*50)
+except:
+    print("오류 발생: `단어 저장` 실패")
+    driver.quit()
+    sys.exit()
+
+
+
+
 # 암기학습 진행
 try:
     driver.find_element(By.CSS_SELECTOR, '#tab_set_all > div.card-list-title > div > div.text-right > a:nth-child(1)').click()
@@ -169,10 +170,10 @@ try:
         sleep(1)
         driver.find_element(By.CSS_SELECTOR, '#wrapper-learn > div > div > div.study-bottom.down > div.btn-text.btn-know-box').click()
 
+    sleep(2)
+    driver.find_element(By.CSS_SELECTOR, 'body > div.study-header-body.mw-1080 > div > div:nth-child(1) > div:nth-child(1) > a').click()
+    driver.find_element(By.CSS_SELECTOR, '#topBackModal > div.modal-dialog > div > div > a:nth-child(8)').click()
     print(" - 암기학습 완료")
-    driver.get(Class_URL)
-    driver.switch_to_alert().accept()
-    driver.switch_to.alert.accept()
 except:
     print("오류 발생: `암기학습 진행` 실패")
     driver.quit()
@@ -180,17 +181,27 @@ except:
 
 
 
-
+''' 리콜학습 불가
+# 리콜학습
 driver.find_element(By.CSS_SELECTOR, '#tab_set_all > div.card-list-title > div > div.text-right > a:nth-child(2)').click()
 sleep(2)
 for i in range(1, cards_num):
-    sleep(1)
+    sleep(2)
     Q_Word = driver.find_element(By.XPATH, f'//*[@id="wrapper-learn"]/div/div/div[2]/div[2]/div[{i}]/div[1]/div/div/div/div[1]/span').text
-    print(Q_Word)
-    for a in range(0, 3):
-        A_Word = driver.find_element(By.XPATH, f'//*[@id="wrapper-learn"]/div/div/div[2]/div[2]/div[{i}]/div[3]/div[{a+1}]/div[2]/div').text
+    print(f"{Q_Word}: {Words_Eng_Kor[Q_Word]}")
 
-        if Words_Eng_Kor[Q_Word] == A_Word:
-            driver.find_element(By.XPATH, f'//*[@id="wrapper-learn"]/div/div/div[2]/div[2]/div[{i}]/div[3]/div[{a+1}]/div[2]').click()
-            break
+    A_Word1 = driver.find_element(By.XPATH, f'//*[@id="wrapper-learn"]/div/div/div[2]/div[2]/div[{i}]/div[3]/div[1]/div[2]/div')
+    A_Word2 = driver.find_element(By.XPATH, f'//*[@id="wrapper-learn"]/div/div/div[2]/div[2]/div[{i}]/div[3]/div[2]/div[2]/div')
+    A_Word3 = driver.find_element(By.XPATH, f'//*[@id="wrapper-learn"]/div/div/div[2]/div[2]/div[{i}]/div[3]/div[3]/div[2]/div')
+    print(f'- [{A_Word1.text}, {A_Word2.text}, {A_Word3.text}]')
+    sleep(2)
+
+    if A_Word1.text == Words_Eng_Kor[Q_Word]:
+        A_Word1.click()
+
+    elif A_Word2.text == Words_Eng_Kor[Q_Word]:
+        A_Word2.click()
+
+    elif A_Word3.text == Words_Eng_Kor[Q_Word]:
+        A_Word3.click()
 '''
